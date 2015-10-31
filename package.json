@@ -1,0 +1,19 @@
+{
+  "name": "home_dashboard",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bugfire/home_dashboard.git"
+  },
+  "main": "home_dashboard.js",
+  "engines": {
+    "node": ">= 0.12.7"
+  },
+  "scripts": {
+    "test": "nodeunit home_dashboard.js"
+  },
+  "dependencies": {
+    "forever": "^0.15.1",
+    "mysql": "^2.9.0"
+  }
+}

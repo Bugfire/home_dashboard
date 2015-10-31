@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>@@TITLE@@</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="bootstrap.min.css" media="screen">
+    <link rel="stylesheet" href="main.css">
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript">
+
+@@JSON_DATA@@
+
+    var total_col3 = [];
+    for (var i = 0; i < jsonData3.rows.length; i++) {
+      for (var j = 1; j < jsonData3.rows[i].c.length; j++) {
+        if (total_col3[j] == undefined)
+          total_col3[j] = 0;
+        total_col3[j] += jsonData3.rows[i].c[j].v;
+      }
+    }
+    var remove_col3 = [ ];
+    for (var i = total_col3.length - 1; i > 0; i--) {
+      if (total_col3[i] == 0) {
+        remove_col3.push(i);
+      }
+    }
+
+    // Load the Visualization API and the piechart package.
+    google.load('visualization', '1', {'packages':['corechart', 'table']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      {
+        var data = new google.visualization.DataTable(jsonData1);
+        var options = {
+                  title:'温度',
+                  vAxis: { title:'温度 (C)', format:'##.#' },
+                  hAxis: { title:'時間', format:'datetime' },
+                  legend: { position: 'top', maxLines: 5 },
+                  xxx_explorer: {},
+                  height:500
+        };
+        var chart1 = new google.visualization.LineChart(document.getElementById('chart1_div'));
+        chart1.draw(data, options);
+      }
+      {
+        var data = new google.visualization.DataTable(jsonData2);
+        var options = {
+                  title:'電気の流れ',
+                  seriesType:'area',
+                  xxx_seriesType:'area',
+                  series: { 1: {type:'bars'}, 3: {type:'bars'}},
+                  vAxis: { title:'電力量 (kW)', format:'##.#' },
+                  hAxis: { title:'時間', format:'datetime' },
+                  bar: { groupWidth: '40%', isStacked: true },
+                  xxx_isStacked: true,
+                  legend: { position: 'top', maxLines: 5 },
+                  xxx_explorer: {},
+                  height:500
+        };
+        var chart2 = new google.visualization.ComboChart(document.getElementById('chart2_div'));
+        chart2.draw(data, options);
+      }
+      {
+        var data = new google.visualization.DataTable(jsonData3);
+        for (var i of remove_col3)
+          data.removeColumn(i);
+        var options = {
+                  title:'詳細消費電力',
+                  vAxis: { title:'消費電力 (W)', format:'#,###' },
+                  hAxis: { title:'時間', format:'date' },
+                  legend: { position: 'top', maxLines: 10 },
+                  xxx_explorer: {},
+                  xxx_curveType: 'function',
+                  height:500
+        };
+        var chart3 = new google.visualization.LineChart(document.getElementById('chart3_div'));
+        chart3.draw(data, options);
+      }
+      {
+        var jsonData4 = {};
+        jsonData4.cols = [
+          { label : '場所', type : 'string' },
+          { label : '消費電力(W)', type : 'number' },
+          { label : '月概算(円)', type : 'number' },
+          { label : '平均(W)', type : 'number' },
+          { label : '月概算(円)', type : 'number' },
+        ];
+        var ti = jsonData3.cols;
+        var vi = jsonData3.rows[jsonData3.rows.length - 1].c;
+        jsonData4.rows = [];
+        var j = 0;
+        for (var i in ti) {
+          if (remove_col3.indexOf(parseInt(i)) != -1)
+            continue;
+          if (ti[i].type != 'string')  {
+            var vv = 0;
+            var tvv = 0;
+            if (j < vi.length) {
+              vv = vi[j].v;
+              for (var k = 0; k < jsonData3.rows.length; k++) {
+                tvv += jsonData3.rows[k].c[j].v;
+              }
+            }
+            tvv /= jsonData3.rows.length;
+            jsonData4.rows.push( { c : [
+              { v : ti[i].label },
+              { v : vv },
+              { v : Math.floor(vv * 24 * 30 * 40 / 1000) },
+              { v : tvv.toFixed(2) },
+              { v : Math.floor(tvv * 24 * 30 * 40 / 1000) },
+            ] } );
+          }
+          j++;
+        }
+        var data = new google.visualization.DataTable(jsonData4);
+        var table1 = new google.visualization.Table(document.getElementById('table1_div'));
+        var options = { width:500 };
+        table1.draw(data, options);
+      }
+    }
+    </script>    
+  </head>
+  <body>
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="#" class="navbar-brand">@@TITLE@@</a>
+        </div>
+      </div>
+      <div class="container">
+        <div class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            対象期間<b><span class="caret"></span></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="m15">15 Minutes</a></li>
+            <li><a href="m30">30 Minutes</a></li>
+            <li><a href="h1">1 Hour</a></li>
+            <li><a href="h8">8 Hours</a></li>
+            <li><a href="d1">1 Day</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">    
+      <div class="page-header">
+        <div class="row">
+          <div class="col-lg-6">                          
+          </div>
+        </div>
+        <div class="col-lg-6">
+        </div>
+      </div>
+      
+      <div class="main" id="content">
+      </div>
+    </div>
+         
+    <div class="container">
+      <div id="chart1_div" style="width:100%"></div>
+    </div>
+
+    <div class="container">
+      <div id="chart2_div" style="width:100%"></div>
+    </div>
+
+    <div class="container">
+      <div id="chart3_div" style="width:100%"></div>
+    </div>
+
+    <div class="container">
+      <div id="table1_div" style="width:100%"></div>
+    </div>
+
+    <div class="container">
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+  </body>
+</html>

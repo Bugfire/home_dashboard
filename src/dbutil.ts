@@ -1,5 +1,5 @@
 /**
- * @license remo_watch v0.1
+ * @license home_dashboard v0.1
  * (c) 2019 Bugfire https://bugfire.dev/
  * License: MIT
  */

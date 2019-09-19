@@ -4,7 +4,7 @@ services:
   app:
     image: bugfire/home_dashboard:latest
     volumes:
-      # - "/share/Docker/Volumes/remo_watch/config:/config:ro"
+      # - "/share/Docker/Volumes/home_dashboard/config:/config:ro"
       - "./config:/config:ro"
     restart: always
     cpu_shares: 20

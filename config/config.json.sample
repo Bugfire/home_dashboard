@@ -1,0 +1,13 @@
+{
+    "db": {
+        "host": "MYSQL_DB_HOSTNAME_OR_IP_HERE",
+        "name": "MYSQL_DB_NAME_HERE",
+        "user": "MYSQL_DB_USER_HERE",
+        "password": "MYSQL_DB_PASSWORD_HERE"
+    },
+    "remo_stats": "MYSQL_DB_TABLE_NAME_HERE",
+    "aiseg_watch_main_name": "MYSQL_DB_TABLE_NAME_HERE",
+    "aiseg_watch_main": "MYSQL_DB_TABLE_NAME_HERE",
+    "aiseg_watch_detail_name": "MYSQL_DB_TABLE_NAME_HERE",
+    "aiseg_watch_detail": "MYSQL_DB_TABLE_NAME_HERE"
+}

@@ -1,15 +1,24 @@
-FROM node:0.12.7
+###
 
-RUN mkdir -p /usr/src/app
+FROM node:10-alpine AS build
+
+COPY package*.json tsconfig.json /usr/src/app/
+COPY src /usr/src/app/src/
 WORKDIR /usr/src/app
-
-COPY package.json /usr/src/app/
 RUN npm install
+RUN npm run build 
 
-COPY home_dashboard.js run.sh res/* /usr/src/app/
+###
 
-VOLUME ["/data"]
+FROM node:10-alpine
 
-EXPOSE 3000
+COPY package*.json /usr/src/app/
+WORKDIR /usr/src/app
+RUN npm install --production
 
-CMD [ "./run.sh" ]
+COPY www /usr/src/app/www/
+COPY --from=build /usr/src/app/dist/ /usr/src/app/dist/
+
+VOLUME [ "/config" ]
+
+CMD [ "npm", "run", "start" ]

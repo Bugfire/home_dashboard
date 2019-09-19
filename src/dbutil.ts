@@ -39,16 +39,18 @@ export const query = async (
   client: mysql.Connection,
   query: string
 ): Promise<{ [key: string]: ColumnType }[]> => {
-  return new Promise((resolve, reject): void => {
-    // console.log(query);
-    client.query(query, (err, result: { [key: string]: ColumnType }[]) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result);
-      }
-    });
-  });
+  return new Promise<{ [key: string]: ColumnType }[]>(
+    (resolve, reject): void => {
+      // console.log(query);
+      client.query(query, (err, result: { [key: string]: ColumnType }[]) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    }
+  );
 };
 
 export const connectAndQueries = async (

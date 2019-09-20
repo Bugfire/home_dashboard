@@ -29,7 +29,8 @@ export const connect = (config: Config): mysql.Connection => {
     user: config.user,
     password: config.password,
     connectTimeout: 10000,
-    supportBigNumbers: true
+    supportBigNumbers: true,
+    timezone: "+09:00"
   });
 };
 

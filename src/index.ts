@@ -1,5 +1,5 @@
 /**
- * @license home_dashboard v1.0.0
+ * @license home_dashboard
  * (c) 2015 Bugfire https://bugfire.dev/
  * License: MIT
  */

@@ -76,14 +76,6 @@ app.get(
 
     const client = dbUtil.connect(CONFIG.db);
 
-    const formatTime = (date: Date): string => {
-      return (
-        ("0" + date.getHours()).slice(-2) +
-        ":" +
-        ("0" + date.getMinutes()).slice(-2)
-      );
-    };
-
     interface GraphJsonCol {
       label: string;
       type: string;
@@ -101,11 +93,19 @@ app.get(
     }
 
     // remo_stats
-    const tempJson: GraphJson = {
+    const roomData1: GraphJson = {
       cols: [
-        { label: "Datetime", type: "string" },
+        { label: "Datetime", type: "datetime" },
         { label: "リビング温度", type: "number" },
         { label: "リビング湿度", type: "number" }
+      ],
+      rows: []
+    };
+    const roomData2: GraphJson = {
+      cols: [
+        { label: "Datetime", type: "datetime" },
+        { label: "リビング照度", type: "number" },
+        { label: "リビングモーションセンサ", type: "number" }
       ],
       rows: []
     };
@@ -116,9 +116,14 @@ app.get(
       );
       results.forEach(row => {
         if (row.datetime instanceof Date && typeof row.te === "number") {
-          const hu = typeof row.hu === "number" ? row.hu : 0;
-          tempJson.rows.push({
-            c: [{ v: formatTime(row.datetime) }, { v: row.te }, { v: hu }]
+          const hu = typeof row.hu === "number" ? row.hu / 100.0 : 0;
+          const il = typeof row.il === "number" ? row.il : 0;
+          const mo = typeof row.mo === "number" ? row.mo : 0;
+          roomData1.rows.push({
+            c: [{ v: row.datetime.toISOString() }, { v: row.te }, { v: hu }]
+          });
+          roomData2.rows.push({
+            c: [{ v: row.datetime.toISOString() }, { v: il }, { v: mo }]
           });
         }
       });
@@ -172,7 +177,7 @@ app.get(
       colTags.forEach(colTag => {
         const label =
           typeof colNames[colTag] === "undefined" ? colTag : colNames[colTag];
-        const type = colTag === "Datetime" ? "string" : "number";
+        const type = colTag === "Datetime" ? "datetime" : "number";
         work.result.cols.push({ label, type });
       });
       {
@@ -185,7 +190,7 @@ app.get(
           colTags.forEach(colTag => {
             const col = row[colTag];
             if (colTag === "Datetime" && col instanceof Date) {
-              jsonRow.c.push({ v: formatTime(col) });
+              jsonRow.c.push({ v: col.toISOString() });
             } else if (typeof col === "number") {
               jsonRow.c.push({ v: col });
             } else {
@@ -200,9 +205,10 @@ app.get(
     const title = `Web statistics watcher [${range.title}]`;
     let file = template.replace(/@@TITLE@@/g, title);
     const jsonData = `
-    var jsonData1 = ${JSON.stringify(tempJson)};
-    var jsonData2 = ${JSON.stringify(aisegWork[0].result)};
-    var jsonData3 = ${JSON.stringify(aisegWork[1].result)};
+    const roomData1 = ${JSON.stringify(roomData1)};
+    const roomData2 = ${JSON.stringify(roomData2)};
+    const powerMainData = ${JSON.stringify(aisegWork[0].result)};
+    const powerDetailData = ${JSON.stringify(aisegWork[1].result)};
 `;
     file = file.replace(/\/\/@@JSON_DATA@@/, jsonData);
     res.send(file);

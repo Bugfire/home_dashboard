@@ -2,7 +2,7 @@ version: '2'
 
 services:
   app:
-    image: bugfire/home_dashboard:0.1
+    image: bugfire/home_dashboard:latest
     volumes:
       - "/share/Docker/Volumes/home_dashboard/config:/config:ro"
     restart: always

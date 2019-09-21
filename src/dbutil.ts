@@ -1,5 +1,5 @@
 /**
- * @license home_dashboard
+ * @license dbutil.ts
  * (c) 2019 Bugfire https://bugfire.dev/
  * License: MIT
  */

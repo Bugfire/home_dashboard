@@ -10,3 +10,9 @@ services:
     mem_limit: "2048m"
     ports:
       - "3000:3000"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://192.168.13.11:514"
+        syslog-format: "rfc3164"
+        tag: "remo_watch"

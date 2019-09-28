@@ -2,17 +2,14 @@
   "name": "home_dashboard",
   "version": "0.1.0",
   "description": "",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Bugfire/home_dashboard.git"
-  },
   "main": "index.js",
   "scripts": {
     "dev": "ts-node src/index.ts ./",
     "build": "tsc",
     "watch": "tsc --watch",
     "lint": "eslint 'src/**/*.ts'",
-    "lint:fix": "eslint --fix 'src/**/*.ts'"
+    "lint:fix": "eslint --fix 'src/**/*.ts'",
+    "test": "ts-node src/config_test.ts"
   },
   "author": "",
   "license": "MIT",

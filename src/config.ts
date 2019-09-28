@@ -1,48 +1,99 @@
 /**
- * @license home_dashboard
+ * @license config
  * (c) 2019 Bugfire https://bugfire.dev/
  * License: MIT
  */
 
-import * as dbUtil from "./dbutil";
+export type ConfigType = { [key: string]: ConfigType } | "number" | "string";
 
-export class Config {
-  public readonly db: dbUtil.Config;
-  /* eslint-disable @typescript-eslint/camelcase */
-  public readonly remo_stats: string;
-  public readonly aiseg_watch_main_name: string;
-  public readonly aiseg_watch_main: string;
-  public readonly aiseg_watch_detail_name: string;
-  public readonly aiseg_watch_detail: string;
-  /* eslint-enable @typescript-eslint/camelcase */
-
-  public constructor(configString: string) {
-    const json = JSON.parse(configString);
-
-    this.db = json.db;
-    /* eslint-disable @typescript-eslint/camelcase */
-    this.remo_stats = json.remo_stats;
-    this.aiseg_watch_main_name = json.aiseg_watch_main_name;
-    this.aiseg_watch_main = json.aiseg_watch_main;
-    this.aiseg_watch_detail_name = json.aiseg_watch_detail_name;
-    this.aiseg_watch_detail = json.aiseg_watch_detail;
-    /* eslint-enable @typescript-eslint/camelcase */
-
-    dbUtil.validateConfig(this.db);
-
-    const errorNames = [
-      "remo_stats",
-      "aiseg_watch_main_name",
-      "aiseg_watch_main",
-      "aiseg_watch_detail_name",
-      "aiseg_watch_detail"
-    ]
-      .filter(v => typeof (this as any)[v] !== "string") // eslint-disable-line @typescript-eslint/no-explicit-any
-      .join(", ");
-    if (errorNames !== "") {
-      throw new Error(`Invalid Config [${errorNames}] is not string`);
-    }
-
-    return this;
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const typeOf = (obj: any): string => {
+  if (Array.isArray(obj)) {
+    return "array";
+  } else {
+    return typeof obj;
   }
+};
+
+const ArraySuffix = "_array";
+
+function ValidateConfigRecursive(
+  jsonObj: any,
+  configType: ConfigType,
+  errors: string[],
+  path: string[]
+): any {
+  const jsonObjType = typeOf(jsonObj);
+  const jsonObjPath = path.join(".");
+
+  // primitive
+  if (typeof configType === "string") {
+    // "number" | "string"
+    if (jsonObjType !== configType) {
+      errors.push(`${jsonObjPath}: Expect ${configType}, but ${jsonObjType}`);
+      return undefined;
+    }
+    return jsonObj;
+  }
+
+  // object
+  if (jsonObjType !== "object") {
+    errors.push(`${jsonObjPath}: Except object, but ${jsonObjType}`);
+    return undefined;
+  }
+
+  const r: any = {};
+  const validKeys = Object.keys(configType);
+  for (const key of validKeys) {
+    const isArray = key.endsWith(ArraySuffix);
+    const configKeyType = configType[key];
+    if (!isArray) {
+      r[key] = ValidateConfigRecursive(
+        jsonObj[key],
+        configKeyType,
+        errors,
+        path.concat(key)
+      );
+    } else {
+      const rawKey = key.substr(0, key.length - ArraySuffix.length);
+      const jsonKeyObj = jsonObj[rawKey];
+      const rawkeyPath = path.concat(rawKey);
+      const jsonKeyType = typeOf(jsonKeyObj);
+      if (jsonKeyType !== "array") {
+        errors.push(`${rawkeyPath}: Except array, but ${jsonKeyType}`);
+      } else {
+        const array: any[] = [];
+        for (let i = 0; i < jsonKeyObj.length; i++) {
+          array[i] = ValidateConfigRecursive(
+            jsonKeyObj[i],
+            configKeyType,
+            errors,
+            rawkeyPath.concat(`${i}`)
+          );
+        }
+        r[rawKey] = array;
+      }
+    }
+  }
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+
+  for (const key of Object.keys(jsonObj)) {
+    const configKey =
+      typeOf(jsonObj[key]) === "array" ? key + ArraySuffix : key;
+    if (typeof configType[configKey] === "undefined") {
+      errors.push(`${path.concat(key).join(".")}: Unknown key in config`);
+    }
+  }
+
+  return r;
+}
+
+export function LoadConfig<T>(configString: string, configType: ConfigType): T {
+  const json = JSON.parse(configString);
+  const errors: string[] = [];
+  ValidateConfigRecursive(json, configType, errors, []);
+  if (errors.length !== 0) {
+    throw new Error(`Invalid Config\n${errors.join("\n")}`);
+  }
+  return json as T;
 }

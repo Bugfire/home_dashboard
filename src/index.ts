@@ -8,13 +8,39 @@ import * as fs from "fs";
 import * as express from "express";
 
 import * as dbUtil from "./dbutil";
-import { Config } from "./config";
+
+import { DBConfig, DBConfigType } from "./dbutil";
+import { LoadConfig, ConfigType } from "./config";
 
 if (process.argv.length <= 2) {
   throw new Error("Invalid argument. Specify top directory of config.");
 }
-const CONFIG = new Config(
-  fs.readFileSync(`${process.argv[2]}config/config.json`, "utf8")
+
+/* eslint-disable @typescript-eslint/camelcase */
+
+interface MyConfig {
+  db: DBConfig;
+  remo_stats: string;
+  aiseg_watch_main_name: string;
+  aiseg_watch_main: string;
+  aiseg_watch_detail_name: string;
+  aiseg_watch_detail: string;
+}
+
+const MyConfigType: ConfigType = {
+  db: DBConfigType,
+  remo_stats: "string",
+  aiseg_watch_main_name: "string",
+  aiseg_watch_main: "string",
+  aiseg_watch_detail_name: "string",
+  aiseg_watch_detail: "string"
+};
+
+/* eslint-enable @typescript-eslint/camelcase */
+
+const CONFIG = LoadConfig<MyConfig>(
+  fs.readFileSync(`${process.argv[2]}config/config.json`, "utf8"),
+  MyConfigType
 );
 
 interface RangeDef {

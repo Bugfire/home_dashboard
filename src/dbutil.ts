@@ -6,23 +6,23 @@
 
 import * as mysql from "mysql";
 
-export interface Config {
+import { ConfigType } from "./config";
+
+export interface DBConfig {
   host: string;
   name: string;
   user: string;
   password: string;
 }
 
-export const validateConfig = (config: Config): void => {
-  const errorNames = ["host", "name", "user", "password"]
-    .filter(v => typeof (config as any)[v] !== "string") // eslint-disable-line @typescript-eslint/no-explicit-any
-    .join(", ");
-  if (errorNames !== "") {
-    throw new Error(`Invalid Config [db.${errorNames}] is not string`);
-  }
+export const DBConfigType: ConfigType = {
+  host: "string",
+  name: "string",
+  user: "string",
+  password: "string"
 };
 
-export const connect = (config: Config): mysql.Connection => {
+export const connect = (config: DBConfig): mysql.Connection => {
   return mysql.createConnection({
     host: config.host,
     database: config.name,
@@ -55,7 +55,7 @@ export const query = async (
 };
 
 export const connectAndQueries = async (
-  config: Config,
+  config: DBConfig,
   queries: string[]
 ): Promise<{ [key: string]: ColumnType }[][]> => {
   if (queries.length === 0) {

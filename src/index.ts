@@ -224,9 +224,6 @@ if (IS_DRYRUN) {
 } else {
   console.log("Start");
 }
-if (IS_DEBUG) {
-  console.log(JSON.stringify(CONFIG, null, 4));
-}
 
 if (!IS_DRYRUN) {
   app.listen(3000, () => {

@@ -8,6 +8,9 @@ import * as mysql from "mysql";
 
 import { ConfigType } from "./config";
 
+const IS_DRYRUN = process.env["NODE_ENV"] === "DRYRUN";
+const IS_DEBUG = IS_DRYRUN || process.env["NODE_ENV"] === "DEBUG";
+
 export interface DBConfig {
   host: string;
   name: string;
@@ -42,7 +45,13 @@ export const query = async (
 ): Promise<{ [key: string]: ColumnType }[]> => {
   return new Promise<{ [key: string]: ColumnType }[]>(
     (resolve, reject): void => {
-      // console.log(query);
+      if (IS_DEBUG) {
+        console.log(`Querying...\n${query}`);
+      }
+      if (IS_DRYRUN) {
+        resolve([]);
+        return;
+      }
       client.query(query, (err, result: { [key: string]: ColumnType }[]) => {
         if (err) {
           reject(err);

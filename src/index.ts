@@ -9,8 +9,8 @@ import * as express from "express";
 
 import * as dbUtil from "./dbutil";
 
-import { DBConfig, DBConfigType } from "./dbutil";
 import { LoadConfig, ConfigType } from "./config";
+import { DBConfig, DBConfigType } from "./dbutil";
 
 if (process.argv.length <= 2) {
   throw new Error("Invalid argument. Specify top directory of config.");

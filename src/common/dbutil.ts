@@ -76,7 +76,7 @@ export const connectAndQueries = async (
     try {
       r.push(await query(client, queries[i]));
     } catch (ex) {
-      if (ex.toString().indexOf("Error: ER_DUP_ENTRY") !== 0) {
+      if (ex.toString().indexOf("Error: ER_DUP_ENTRY") !== 0 || IS_DEBUG) {
         console.error(ex.toString());
       }
     }

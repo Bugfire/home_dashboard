@@ -11,8 +11,8 @@
     "dev": "ts-node src/index.ts ./",
     "build": "tsc",
     "watch": "tsc --watch",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint --fix src/**/*.ts"
+    "lint": "eslint 'src/**/*.ts'",
+    "lint:fix": "eslint --fix 'src/**/*.ts'"
   },
   "author": "",
   "license": "MIT",

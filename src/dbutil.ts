@@ -15,7 +15,8 @@ export interface Config {
 
 export const validateConfig = (config: Config): void => {
   const errorNames = ["host", "name", "user", "password"]
-    .filter(v => typeof config[v] !== "string")
+
+    .filter(v => typeof (config as any)[v] !== "string") // eslint-disable-line @typescript-eslint/no-explicit-any
     .join(", ");
   if (errorNames !== "") {
     throw new Error(`Invalid Config [db.${errorNames}] is not string`);

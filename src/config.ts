@@ -37,7 +37,7 @@ export class Config {
       "aiseg_watch_detail_name",
       "aiseg_watch_detail"
     ]
-      .filter(v => typeof this[v] !== "string")
+      .filter(v => typeof (this as any)[v] !== "string") // eslint-disable-line @typescript-eslint/no-explicit-any
       .join(", ");
     if (errorNames !== "") {
       throw new Error(`Invalid Config [${errorNames}] is not string`);

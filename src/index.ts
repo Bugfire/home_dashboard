@@ -7,41 +7,15 @@
 import * as fs from "fs";
 import * as express from "express";
 
-import * as dbUtil from "./dbutil";
+import * as dbUtil from "./common/dbutil";
 
-import { LoadConfig, ConfigType } from "./config";
-import { DBConfig, DBConfigType } from "./dbutil";
+import { LoadConfig } from "./myconfig";
 
 if (process.argv.length <= 2) {
   throw new Error("Invalid argument. Specify top directory of config.");
 }
 
-/* eslint-disable @typescript-eslint/camelcase */
-
-interface MyConfig {
-  db: DBConfig;
-  remo_stats: string;
-  aiseg_watch_main_name: string;
-  aiseg_watch_main: string;
-  aiseg_watch_detail_name: string;
-  aiseg_watch_detail: string;
-}
-
-const MyConfigType: ConfigType = {
-  db: DBConfigType,
-  remo_stats: "string",
-  aiseg_watch_main_name: "string",
-  aiseg_watch_main: "string",
-  aiseg_watch_detail_name: "string",
-  aiseg_watch_detail: "string"
-};
-
-/* eslint-enable @typescript-eslint/camelcase */
-
-const CONFIG = LoadConfig<MyConfig>(
-  fs.readFileSync(`${process.argv[2]}config/config.json`, "utf8"),
-  MyConfigType
-);
+const CONFIG = LoadConfig(`${process.argv[2]}config/config.json`);
 
 interface RangeDef {
   title: string;

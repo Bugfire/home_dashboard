@@ -15,7 +15,6 @@ export interface Config {
 
 export const validateConfig = (config: Config): void => {
   const errorNames = ["host", "name", "user", "password"]
-
     .filter(v => typeof (config as any)[v] !== "string") // eslint-disable-line @typescript-eslint/no-explicit-any
     .join(", ");
   if (errorNames !== "") {
@@ -68,7 +67,9 @@ export const connectAndQueries = async (
     try {
       r.push(await query(client, queries[i]));
     } catch (ex) {
-      console.error(ex.toString());
+      if (ex.toString().indexOf("Error: ER_DUP_ENTRY") !== 0) {
+        console.error(ex.toString());
+      }
     }
   }
   client.end();

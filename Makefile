@@ -20,8 +20,11 @@ logs: ## Show docker logs
 lint: ## Run eslint
 	npm run lint
 
+dryrun: ## Run localy dryrun
+	NODE_ENV=DRYRUN npm run dev
+
 dev: ## Run localy
-	npm run dev
+	NODE_ENV=DEBUG npm run dev
 
 clean: ## Clean docker container, images
 	docker ps -a | grep -v "CONTAINER" | awk '{print $$1}' | xargs docker rm

@@ -15,6 +15,8 @@ if (process.argv.length <= 2) {
   throw new Error("Invalid argument. Specify top directory of config.");
 }
 
+const IS_DRYRUN = process.env["NODE_ENV"] === "DRYRUN";
+const IS_DEBUG = IS_DRYRUN || process.env["NODE_ENV"] === "DEBUG";
 const CONFIG = LoadConfig(`${process.argv[2]}config/config.json`);
 
 interface RangeDef {
@@ -215,6 +217,19 @@ app.get(
   }
 );
 
-app.listen(3000, () => {
-  console.log("Express app start");
-});
+if (IS_DRYRUN) {
+  console.log("Start as DRYRUN");
+} else if (IS_DEBUG) {
+  console.log("Start as DEBUG");
+} else {
+  console.log("Start");
+}
+if (IS_DEBUG) {
+  console.log(JSON.stringify(CONFIG, null, 4));
+}
+
+if (!IS_DRYRUN) {
+  app.listen(3000, () => {
+    console.log("Express app start");
+  });
+}

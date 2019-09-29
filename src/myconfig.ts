@@ -22,11 +22,11 @@ interface MyConfig {
 
 const MyConfigType: ConfigType = {
   db: DBConfigType,
-  remo_stats: "string",
-  aiseg_watch_main_name: "string",
-  aiseg_watch_main: "string",
-  aiseg_watch_detail_name: "string",
-  aiseg_watch_detail: "string"
+  remo_stats: "",
+  aiseg_watch_main_name: "",
+  aiseg_watch_main: "",
+  aiseg_watch_detail_name: "",
+  aiseg_watch_detail: ""
 };
 
 /* eslint-enable @typescript-eslint/camelcase */

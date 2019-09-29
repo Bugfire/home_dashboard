@@ -19,10 +19,10 @@ export interface DBConfig {
 }
 
 export const DBConfigType: ConfigType = {
-  host: "string",
-  name: "string",
-  user: "string",
-  password: "string"
+  host: "",
+  name: "",
+  user: "",
+  password: ""
 };
 
 export const connect = (config: DBConfig): mysql.Connection => {

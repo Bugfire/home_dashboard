@@ -2,7 +2,7 @@ version: '2'
 
 services:
   app:
-    image: bugfire/home_dashboard:0.1.5
+    image: bugfire/home_dashboard:0.1.6
     volumes:
       - "./config:/config:ro"
     restart: always

@@ -28,28 +28,24 @@ const rangeTable: { [key: string]: RangeDef } = {
   d1: {
     title: "1 Day",
     where:
-      "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND Datetime <= NOW() AND (Datetime LIKE '%:00:00' OR Datetime Like '%:20:00' OR Datetime Like '%:40:00')"
+      "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND Datetime <= NOW() AND (Datetime LIKE '%:00:00' OR Datetime Like '%:20:00' OR Datetime Like '%:40:00')",
   },
   h8: {
     title: "8 Hours",
-    where:
-      "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 8 HOUR) AND Datetime <= NOW() AND Datetime LIKE '%0:00'"
+    where: "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 8 HOUR) AND Datetime <= NOW() AND Datetime LIKE '%0:00'",
   },
   h1: {
     title: "1 Hour",
-    where:
-      "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 1 HOUR) AND Datetime <= NOW()"
+    where: "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 1 HOUR) AND Datetime <= NOW()",
   },
   m30: {
     title: "30 Minutes",
-    where:
-      "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 30 MINUTE) AND Datetime <= NOW()"
+    where: "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 30 MINUTE) AND Datetime <= NOW()",
   },
   m15: {
     title: "15 Minutes",
-    where:
-      "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 15 MINUTE) AND Datetime <= NOW()"
-  }
+    where: "WHERE Datetime > DATE_SUB(NOW(), INTERVAL 15 MINUTE) AND Datetime <= NOW()",
+  },
 };
 
 const app = express();
@@ -99,33 +95,33 @@ app.get(
       cols: [
         { label: "Datetime", type: "datetime" },
         { label: "リビング温度", type: "number" },
-        { label: "リビング湿度", type: "number" }
+        { label: "リビング湿度", type: "number" },
       ],
-      rows: []
+      rows: [],
     };
     const roomData2: GraphJson = {
       cols: [
         { label: "Datetime", type: "datetime" },
         { label: "リビング照度", type: "number" },
-        { label: "リビングモーションセンサ", type: "number" }
+        { label: "リビングモーションセンサ", type: "number" },
       ],
-      rows: []
+      rows: [],
     };
     {
       const results = await dbUtil.query(
         client,
         `SELECT * FROM ${CONFIG.remo_stats} ${range.where} ORDER BY datetime;`
       );
-      results.forEach(row => {
+      results.forEach((row) => {
         if (row.datetime instanceof Date && typeof row.te === "number") {
           const hu = typeof row.hu === "number" ? row.hu / 100.0 : 0;
           const il = typeof row.il === "number" ? row.il : 0;
           const mo = typeof row.mo === "number" ? row.mo : 0;
           roomData1.rows.push({
-            c: [{ v: row.datetime.toISOString() }, { v: row.te }, { v: hu }]
+            c: [{ v: row.datetime.toISOString() }, { v: row.te }, { v: hu }],
           });
           roomData2.rows.push({
-            c: [{ v: row.datetime.toISOString() }, { v: il }, { v: mo }]
+            c: [{ v: row.datetime.toISOString() }, { v: il }, { v: mo }],
           });
         }
       });
@@ -142,23 +138,20 @@ app.get(
       {
         nameTable: CONFIG.aiseg_watch_main_name,
         valueTable: CONFIG.aiseg_watch_main,
-        result: { cols: [], rows: [] }
+        result: { cols: [], rows: [] },
       },
       {
         nameTable: CONFIG.aiseg_watch_detail_name,
         valueTable: CONFIG.aiseg_watch_detail,
-        result: { cols: [], rows: [] }
-      }
+        result: { cols: [], rows: [] },
+      },
     ];
 
     for (const work of aisegWork) {
       const colNames: { [key: string]: string } = {};
       {
-        const results = await dbUtil.query(
-          client,
-          `SELECT * FROM ${work.nameTable};`
-        );
-        results.forEach(row => {
+        const results = await dbUtil.query(client, `SELECT * FROM ${work.nameTable};`);
+        results.forEach((row) => {
           if (typeof row.Tag === "string" && typeof row.Name === "string") {
             colNames[row.Tag] = row.Name;
           }
@@ -166,19 +159,15 @@ app.get(
       }
       const colTags: string[] = [];
       {
-        const results = await dbUtil.query(
-          client,
-          `SHOW COLUMNS FROM ${work.valueTable}`
-        );
-        results.forEach(row => {
+        const results = await dbUtil.query(client, `SHOW COLUMNS FROM ${work.valueTable}`);
+        results.forEach((row) => {
           if (typeof row.Field === "string") {
             colTags.push(row.Field);
           }
         });
       }
-      colTags.forEach(colTag => {
-        const label =
-          typeof colNames[colTag] === "undefined" ? colTag : colNames[colTag];
+      colTags.forEach((colTag) => {
+        const label = typeof colNames[colTag] === "undefined" ? colTag : colNames[colTag];
         const type = colTag === "Datetime" ? "datetime" : "number";
         work.result.cols.push({ label, type });
       });
@@ -187,9 +176,9 @@ app.get(
           client,
           `SELECT * FROM ${work.valueTable} ${range.where} ORDER BY Datetime;`
         );
-        results.forEach(row => {
+        results.forEach((row) => {
           const jsonRow: GraphJsonRow = { c: [] };
-          colTags.forEach(colTag => {
+          colTags.forEach((colTag) => {
             const col = row[colTag];
             if (colTag === "Datetime" && col instanceof Date) {
               jsonRow.c.push({ v: col.toISOString() });

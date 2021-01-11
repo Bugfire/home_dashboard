@@ -22,7 +22,7 @@ export const DBConfigType: ConfigType = {
   host: "",
   name: "",
   user: "",
-  password: ""
+  password: "",
 };
 
 export const connect = (config: DBConfig): mysql.Connection => {
@@ -33,34 +33,29 @@ export const connect = (config: DBConfig): mysql.Connection => {
     password: config.password,
     connectTimeout: 10000,
     supportBigNumbers: true,
-    timezone: "+09:00"
+    timezone: "+09:00",
   });
 };
 
 type ColumnType = number | string | Date | null;
 
-export const query = async (
-  client: mysql.Connection,
-  query: string
-): Promise<{ [key: string]: ColumnType }[]> => {
-  return new Promise<{ [key: string]: ColumnType }[]>(
-    (resolve, reject): void => {
-      if (IS_DEBUG) {
-        console.log(`Querying...\n${query}`);
-      }
-      if (IS_DRYRUN) {
-        resolve([]);
-        return;
-      }
-      client.query(query, (err, result: { [key: string]: ColumnType }[]) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+export const query = async (client: mysql.Connection, query: string): Promise<{ [key: string]: ColumnType }[]> => {
+  return new Promise<{ [key: string]: ColumnType }[]>((resolve, reject): void => {
+    if (IS_DEBUG) {
+      console.log(`Querying...\n${query}`);
     }
-  );
+    if (IS_DRYRUN) {
+      resolve([]);
+      return;
+    }
+    client.query(query, (err, result: { [key: string]: ColumnType }[]) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
 };
 
 export const connectAndQueries = async (
@@ -87,10 +82,7 @@ export const connectAndQueries = async (
 
 export const getDateJST = (): string => {
   return (
-    new Date(new Date().getTime() + 9 * 3600 * 1000)
-      .toISOString()
-      .replace(/T/, " ")
-      .replace(/\..+/, "")
-      .slice(0, -2) + "00"
+    new Date(new Date().getTime() + 9 * 3600 * 1000).toISOString().replace(/T/, " ").replace(/\..+/, "").slice(0, -2) +
+    "00"
   );
 };
